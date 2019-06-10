@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1560196508978.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2831338471",
+    "id" : "5F117157",
+    "lastKnownWriteTime" : 1560197608,
+    "last_content_update" : 1560197608695,
+    "path" : "G:/My Drive/MyResearch/12.SoilHealthDB/SoilHealthDB/RScripts/0 SoilHealthDB_quality_check.R",
+    "project_path" : "RScripts/0 SoilHealthDB_quality_check.R",
+    "properties" : {
+        "cursorPosition" : "27,2",
+        "scrollLine" : "16"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

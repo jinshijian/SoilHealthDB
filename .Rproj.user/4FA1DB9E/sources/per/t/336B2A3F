@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1560195505733.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4126997481",
+    "id" : "336B2A3F",
+    "lastKnownWriteTime" : 1560197104,
+    "last_content_update" : 1560197104939,
+    "path" : "G:/My Drive/MyResearch/12.SoilHealthDB/SoilHealthDB/RScripts/1 SiteLocation_Plot.R",
+    "project_path" : "RScripts/1 SiteLocation_Plot.R",
+    "properties" : {
+        "cursorPosition" : "18,0",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
