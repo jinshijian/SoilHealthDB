@@ -30,17 +30,16 @@ rsconnect/
 .Rproj.user
 
 # Script products
-outputs
+outputs/
 
 # OS files
 .DS_Store
 
 # Manuscripts
-ESSD
-Manuscript
-Old
-outputs
-ScientificDataJournal
+ESSD/
+Manuscript/
+Old/
+ScientificDataJournal/
 
 
 
