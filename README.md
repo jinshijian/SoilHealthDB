@@ -8,7 +8,7 @@ Here, we compiled data from a set of soil health measurements collected across 4
 R code for quality checking and data processing are available at **RScripts**.
 All data (including meta data for clerification) were stored in 'SoilHealthDB_V1.xlsx'.
 
-### `DESCRIPTION.txt`, which includes 15 seets:
+### `DESCRIPTION.txt`, which includes 15 sheets:
 * Sheet1: Include all digitized data from 281 papers
 * ReadMe: Descriptions about SoilHealthDB
 * Explanation: Description about each column in Sheet 1
