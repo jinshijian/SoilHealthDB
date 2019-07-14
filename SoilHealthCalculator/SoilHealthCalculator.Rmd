@@ -1,0 +1,255 @@
+---
+title: "SoilHealthCalculator"
+author: "Jinshi"
+date: "June 29, 2019"
+output:
+  word_document: default
+  html_document: default
+---
+
+
+```{r preliminaries, message=FALSE, include=FALSE, echo=FALSE, cache=TRUE}
+# Set chunks defaults; these options will be applied to all subsequent chunks
+knitr::opts_chunk$set(results = 'hide', message = TRUE, include = TRUE, echo = FALSE, cache = TRUE,
+                      fig.height = 4, fig.width = 8)
+# Constants
+OUTPUT_DIR		<- "outputs/"
+DATA_DIR <- 'data'
+# Create output and log folders if they do not exist
+if(!file.exists(OUTPUT_DIR)) dir.create(OUTPUT_DIR)
+# install.packages('kableExtra')
+# Load required packages
+# install.packages('agricolae')
+library(agricolae)
+# install.packages('multcompView')
+library(multcompView)
+library(bootstrap)
+library("metafor")
+library("bootstrap")
+library(cowplot)
+library(data.table)
+library(ggplot2)
+theme_set(theme_bw())
+library(lubridate)
+library(kableExtra)
+library(cowplot)
+library(knitr)
+library("ggpubr")
+library(reshape)
+library(ggplot2)
+# install.packages("ggmap")
+library(ggmap)
+# install.packages("maps")
+library(maps)
+# install.packages("mapdata")
+library(mapdata)
+# library(tidyr)
+library(car)
+library(dplyr)
+
+# Source all needed functions
+# source('RScripts/functions.R')
+```
+
+
+
+```{r}
+# load data in
+library(dplyr)
+SoilHealthCC <- read.csv('data/SoilHealthDB_V0.csv', header = T)
+data <- read.csv("outputs/SoilHealth_UANOVA_outputs.csv")
+
+# remove AFS, Orchard, and pasture
+SoilHealthCC %>%  filter(Conservation_Type != "AFS" & Conservation_Type != "Pasture" & Conservation_Type != "Orchard") -> SoilHealthCC
+
+SoilHealthCC$GrainCropGroup <- as.character(SoilHealthCC$GrainCropGroup)
+unique(SoilHealthCC$GrainCropGroup)
+
+
+
+```
+
+
+
+
+```{r}
+# get columns number hold indicators
+# last meta infor column
+which(colnames(SoilHealthCC) == 'CCTermination')
+colnames(SoilHealthCC[,c(1:which(colnames(SoilHealthCC) == 'CCTermination'))]) # all background information
+
+# get all response columns
+# first response infor column
+which(colnames(SoilHealthCC) == 'BiomassCash_C')
+
+# OC
+which(colnames(SoilHealthCC) == 'OC_C')
+# N
+which(colnames(SoilHealthCC) == 'N_C')
+# last useful parameter
+which(colnames(SoilHealthCC) == 'MBN_C')
+
+respcol <- c(seq(which(colnames(SoilHealthCC) == 'BiomassCash_C'),which(colnames(SoilHealthCC) == 'OC_C'),5)
+             ,seq(which(colnames(SoilHealthCC) == 'N_C'),which(colnames(SoilHealthCC) == 'MBN_C'),5)) # all response columns
+
+```
+
+
+
+```{r}
+# plot Normal distribution 
+par( mar=c(2, 0.2, 0.2, 0.2)
+     , mai=c(0.6, 0.7, 0.0, 0.1)  # by inches, inner margin
+     , omi = c(0.0, 0.1, 0.4, 0.1)  # by inches, outer margin
+     , mgp = c(0.5, 0.5, 0) # set distance of axis
+     , tcl = 0.4
+     , cex.axis = 1.0
+     , mfrow=c(1,2) )
+
+for (i in c(1:length(respcol)) ) {
+# for (i in 2) {
+  
+  # i = 2
+  subdata <- SoilHealthCC[, c(which(colnames(SoilHealthCC) == 'StudyID'|colnames(SoilHealthCC) == 'ExperimentID'|colnames(SoilHealthCC) == 'Tillage_Top_T')
+                              , respcol[i], respcol[i]+1
+                              )]
+  
+  subdata <- subdata[!is.na(subdata[,4]), ]
+  
+  subdata$yi <- log(subdata[,5])-log(subdata[,4])
+  
+  colnames(subdata)
+  
+  if (colnames (subdata)[4] == "Erosion_C" |colnames (subdata)[4] == "Runoff_C"| colnames (subdata)[4] == "Diseases_C"
+      | colnames (subdata)[4] == "Leaching_C"| colnames (subdata)[4] == "Weed_C"| colnames (subdata)[4] == "Pests_C")
+  {
+    # is.finite(x) value change to min of yi
+    subdata[is.infinite(subdata$yi),]$yi <- ifelse (subdata[is.infinite(subdata$yi),]$yi>0, max(subdata[is.finite(subdata$yi),]$yi)
+                                                    , min(subdata[is.finite(subdata$yi),]$yi))
+  }
+  
+  subdata <- subdata[!is.na(subdata$yi),]
+  
+  # hist gram and QQ plot *********************************************************************
+  list_histo <- hist(subdata$yi, col='gray',breaks=50
+       , las = 1
+       , cex = 1
+       , main = ""
+       , xlab = ""
+       , ylab = "" )
+  # lines(density(Shannon_ANOVA$residuals), col="blue", lwd=2)
+  box()
+  mtext(side = 1, text = expression("Response Ratio"), line = 1.75, cex=1, outer = F)
+  mtext(side = 2, text = expression("Frequency (n)"), line = 2.0, cex=1.0, outer = F)
+  
+  # shapiro.test
+  shapiro <- shapiro.test(subdata$yi)
+  shapiro_p <- shapiro$p.value
+  text(min(subdata$yi)*0.95, max(list_histo$counts)*0.95
+       , paste("shapiro(p) = ",round(shapiro_p, 2)), cex = 1, adj = 0)
+ 
+  # QQ plot
+  qqPlot(subdata$yi
+         , las = 1
+         , cex = 1
+         , pch = 1
+         , main = ""
+         , xlab = ""
+         , ylab = ""
+         , col.lines  = 'red')
+  
+  mtext(side = 1, text = expression("Normal data quantile"), line = 1.75, cex=1, outer = F)
+  mtext(side = 2, text = expression("Normal theoretical quantile"), line = 2.0, cex=1.0, outer = F)
+  
+  
+  # other information
+  response <- colnames(subdata)[4]
+  response <- substr(response,1, (nchar(response)-2))
+  n_obs <- length(subdata[,1])
+  n_study <- length(unique(subdata$StudyID))
+  
+  mtext(side = 3, text = paste(response," (",n_obs,"/",n_study,")", sep=""), line = 0.5, cex=1, outer = T)
+  
+  
+  print(paste("**********", i, response, "**********"))
+  
+}
+
+```
+
+
+
+```{r fig.height = 6, fig.width = 12}
+# plot UANOVA results
+par( mar=c(2, 0.2, 0.2, 0.2)
+     , mai=c(0.15, 0.6, 0.1, 0.1)  # by inches, inner margin
+     , omi = c(1.6, 0.3, 0.3, 0.1)  # by inches, outer margin 
+     , mgp = c(0, 0.3, 0) # set distance of axis
+     , tcl = 0.4
+     , cex.axis = 1.25
+     , mfrow=c(1,1))
+
+var_ID <- unique(data$ID)
+
+for (i in 1:length(var_ID)) {
+# for (i in 1) {
+  
+  # i = 2
+  subdata <- data[data$ID == var_ID[i],]
+  
+  # subdata$x_value <- c(1,3:4, 6:8, 10:13)
+  subdata$x_value <- c(1:length(subdata$ID))
+  
+  y_min <- min(subdata$Low, na.rm = T)
+  y_max <- max(subdata$High, na.rm = T)
+  
+  
+  plot(subdata$Mean ~ subdata$x_value, cex=1.25, lwd=2
+       # ,xlim=c(0,21),ylim=c(1,16)
+       , las=1
+       , xaxt='n'
+       , xlim = c(1, length(subdata$ID))
+       , ylim = c(y_min, y_max)
+       , xlab = '', ylab='', main=''
+       , col = ifelse (subdata$obs < 5, "red", "black")
+       , pch = ifelse (subdata$obs < 5,4,16)
+       )
+  
+  abline(h=0, col="red", lty=2, lwd=2)
+  
+  arrows(subdata$x_value,subdata$Low,subdata$x_value,subdata$High
+         ,code=3,length=0.0,angle=90,col=ifelse (subdata$obs < 5, "red", "black"),lwd=2)
+  
+  axis (side = 1, at = subdata$x_value, labels = paste(subdata$SubGroup, " (", subdata$obs, ")", sep = "")
+        # , cex=0.5
+        , las = 2
+        )
+  
+  # get p value information of each anova
+  P_climate <- round(subdata[subdata$TopGroup=="Climate",]$p_UB_Anova[2], 4) # climate anoava
+  P_texture <- round(subdata[subdata$TopGroup=="Texture",]$p_UB_Anova[2], 4) # texture anoava
+  P_CoverCrop <- round(subdata[subdata$TopGroup=="Cover crop",]$p_UB_Anova[2], 4) # CC anoava
+  P_GrainCrop <- round(subdata[subdata$TopGroup=="Grain crop",]$p_UB_Anova[2], 4) # Grain crop anoava
+  
+  
+  # add 2 rectangles 
+  rect(1.5, y_min*ifelse(y_min>0, 0.5, 2), 5.5, y_max*ifelse(y_max<0, 0.1, 2), col= rgb(1,0,0, alpha = 0.5)
+       , border = rgb(1,0,0, alpha = 0.5))
+  
+  rect(9.5, y_min*ifelse(y_min>0, 0.5, 2), 13.5, y_max*ifelse(y_max<0, 0.1, 2), col= rgb(1,1,0, alpha = 0.5)
+       , border = rgb(1,1,0, alpha = 0.5))
+  
+  
+  axis (side = 3, at = c(1, 3.5, 7.5, 11.5, 19), cex=1.25, labels = c("all", paste("C (p=", P_climate, ")", sep = "")
+                                                                      , paste("T (p=", P_texture, ")", sep = "")
+                                                                      , paste("CCs (p=", P_CoverCrop, ")", sep = "")
+                                                                      , paste("GCs (p=", P_GrainCrop, ")", sep = "")  ))
+  
+  # ?rect()
+  # add x labels
+  
+  mtext(side = 2, text = paste(subdata$Response[1], " (log RR)", sep=""), line = -0.25, cex=1.25, outer = T)
+  
+}
+```
+
