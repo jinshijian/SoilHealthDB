@@ -4,6 +4,8 @@
 
 # Session Data files
 .RData
+MU_Global.csv
+
 
 # Example code in package build process
 *-Ex.R
@@ -38,7 +40,5 @@
 
 # path
 # /G/My\ Drive/MyResearch/12.SoilHealthDB/SoilHealthDB
-
-
 
 .Rproj.user
