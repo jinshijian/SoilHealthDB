@@ -4,7 +4,10 @@
 
 # Session Data files
 .RData
+
+# Larg file
 MU_Global.csv
+T_Clay_CEC.csv
 
 
 # Example code in package build process
@@ -30,13 +33,13 @@ MU_Global.csv
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
 
 # Script products
-/outputs
+outputs/*
 
 # OS files
 .DS_Store
 
 # Manuscripts
-/Manuscript
+Manuscript/*
 
 # path
 # /G/My\ Drive/MyResearch/12.SoilHealthDB/SoilHealthDB
