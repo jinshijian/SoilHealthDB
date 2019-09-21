@@ -1,0 +1,1 @@
+{"frames":[{"character_number":0,"end_character_number":0,"end_line_number":0,"file":"","func":"density(SoilHealthCC[SoilHealthCC$cec > 0, ]$cec, na.rm = TRUE)","line_number":0}],"message":"Error in density(SoilHealthCC[SoilHealthCC$cec > 0, ]$cec, na.rm = TRUE) : \n  object 'SoilHealthCC' not found\n"}

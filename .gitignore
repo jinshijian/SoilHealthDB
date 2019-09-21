@@ -1,47 +1,17 @@
-# History files
+# file or dir in this file will be ignored
 .Rhistory
-.Rapp.history
-
-# Session Data files
-.RData
-
-# Larg file
 MU_Global.csv
 T_Clay_CEC.csv
+SHDB.html
 
+# ignore all files in any directory named Manuscript/SHDB_cash*SHDB/files
+Manuscript/
+SHDB_cache/
+SHDB_files/
+Old/
 
-# Example code in package build process
-*-Ex.R
+# ignore all .ini
+*.ini
 
-# Output files from R CMD build
-/*.tar.gz
-
-# Output files from R CMD check
-/*.Rcheck/
-
-# RStudio files
-.Rproj.user/
-
-# knitr and R markdown default cache directories
-/*_cache/
-/cache/
-
-# Temporary files created by R markdown
-*.utf8.md
-*.knit.md
-
-# Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
-
-# Script products
-outputs/*
-
-# OS files
-.DS_Store
-
-# Manuscripts
-Manuscript/*
-
-# path
+# project path
 # /G/My\ Drive/MyResearch/12.SoilHealthDB/SoilHealthDB
-
-.Rproj.user
