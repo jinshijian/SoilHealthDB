@@ -1,7 +1,7 @@
 # file or dir in this file will be ignored
 .Rhistory
-MU_Global.csv
-T_Clay_CEC.csv
+data/MU_Global.csv
+data/T_Clay_CEC.csv
 SHDB.html
 
 # ignore all files in any directory named Manuscript/SHDB_cash*SHDB/files
