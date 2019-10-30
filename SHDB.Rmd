@@ -7,9 +7,9 @@ output: html_document
 
 
 ## Load packages
-```{r load R packages, message=FALSE, echo=FALSE}
+```{r load R packages, message=FALSE, echo=FALSE, cache=TRUE}
 # library("gridExtra")
-# install.packages("here")
+# install.packages("agricolae")
 library(here)
 library(agricolae)
 # install.packages('multcompView')
@@ -35,15 +35,20 @@ library(ggmap)
 library(maps)
 # install.packages("mapdata")
 library(mapdata)
-# library(tidyr)
-# install.packages('car')
+library(tidyr)
+# install.packages('dplyr')
 library(car)
 library(dplyr)
 library(stringr)
+
+# install.packages("raster")
+library(tiff)
+library(raster)
+
 source('RScripts/functions.R')
 ```
 
-## preliminary setup
+## Preliminary setup
 ```{r preliminaries, message=FALSE, include=FALSE, echo=FALSE, cache=FALSE}
 # Set chunks defaults; these options will be applied to all subsequent chunks
 knitr::opts_chunk$set(results = 'hide', message = TRUE, include = TRUE, echo = FALSE, cache = TRUE, warning = FALSE,
@@ -52,26 +57,39 @@ knitr::opts_chunk$set(results = 'hide', message = TRUE, include = TRUE, echo = F
 ```
 
 ## Load data
-```{r load data}
+```{r load data1}
 
 SoilHealthDB <- read.csv("data/SoilHealthDB_V1.csv", header = T)
 
-koeppen <- read.table("data/Koeppen-Geiger-ASCII.txt", header = TRUE, sep = "")
-IGBP <- read.table("data/IGBP2010Point.txt", header = TRUE, sep = ",")
-ClimateDel <- read.csv("data/summarized_climate.csv")
-DSMW_point <- read.csv("data/DSMW_Point.csv")
-DSMW_soiltype <- read.csv("data/DSMW_SoilType.csv")
+koeppen <- read.table("data/other_data/Koeppen-Geiger-ASCII.txt", header = TRUE, sep = "")
+IGBP <- read.table("data/other_data/IGBP2010Point.txt", header = TRUE, sep = ",")
+ClimateDel <- read.csv("data/other_data/summarized_climate.csv")
+DSMW_point <- read.csv("data/other_data/DSMW_Point.csv")
+DSMW_soiltype <- read.csv("data/other_data/DSMW_SoilType.csv")
 
-lat <- read.csv("data/lat.csv")
-lon <- read.csv("data/lon.csv")
-cec <- read.csv("data/T_Clay_CEC.csv")
+lat <- read.csv("data/other_data/lat.csv")
+lon <- read.csv("data/other_data/lon.csv")
+cec <- read.csv("data/other_data/T_Clay_CEC.csv")
+wrb <- raster('data/WRB/wsrc_.tif')
+wrb_point <- rasterToPoints(wrb)
+wrb_point <- as.data.frame(wrb_point)
+wrb_point %>% mutate(Lat_round = round(y*4)/4, Long_round = round(x*4)/4) -> wrb_point
+SoilHealthDB %>% mutate(Lat_round = round(Latitude*4)/4, Long_round = round(Longitude*4)/4)
+wrb_attributes <- read.csv("data/WRB/wrb.csv")
+```
 
+
+## Prepare data and calculation
+```{r data calculation}
+# The following functions takes long time to finish
 SoilHealthDB <- get_koeppon(SoilHealthDB, koeppen)
 SoilHealthDB <- get_Del(SoilHealthDB, ClimateDel)
-SoilHealthDB <- get_soil(SoilHealthDB, DSMW_point)
+# SoilHealthDB <- get_soil(SoilHealthDB, DSMW_point)
 SoilHealthDB <- get_cec(SoilHealthDB)
-
-left_join(SoilHealthDB, DSMW_soiltype %>% select(VALUE_, FAOSOIL), by = c("nDSMW" = "VALUE_")) -> SoilHealthDB
+SoilHealthDB <- get_wrb(SoilHealthDB)
+# left_join(SoilHealthDB, wrb_point %>% dplyr::select(Lat_round, Long_round, wsrc_), by=c("Lat_round", "Long_round"))
+# left_join(SoilHealthDB, DSMW_soiltype %>% select(VALUE_, FAOSOIL), by = c("nDSMW" = "VALUE_")) -> SoilHealthDB # FAO soil classfication
+left_join(SoilHealthDB, wrb_attributes, by = c("wrb" = "CASE")) -> SoilHealthDB
 matrix_cec <- as.matrix(cec)
 SoilHealthDB %>% mutate(KoeppenGroup = case_when(Koeppen %in% c("Af", "Am", "As", "Aw") ~ "Equat"
                                                  , Koeppen %in% c("BSh", "BSk", "BWh") ~ "Arid"
@@ -148,12 +166,16 @@ tibble( SoilClass = c("Acrisols(867)", "Cambisols(764)", "Chernozems(40)" ,"Rend
   theme(axis.text.x = element_text(angle=45, vjust = 1, hjust = 1)) +
   labs(x=expression(Soil~group), y="Samples (n)") -> plot_soilgroup
 
+SoilHealthDB %>% filter(!is.na(DESCRIP)) %>% ggplot(aes(DESCRIP)) + geom_bar() +
+  theme(axis.text.x = element_text(angle=45, vjust = 1, hjust = 1)) +
+  labs(x=expression(WRB~soil~group), y="Count") -> plot_soilgroup2
+
 # Combine all fanels for Figure 4
 plot_grid(plot_climate, plot_MAT, plot_MAP, nrow = 1, labels = c("a", "b", "c"), hjust = c(-7.5, -7, -8.5), vjust = 2) -> p1
-plot_grid(p1, plot_soilgroup, ncol = 1, labels = c("", "d"), hjust = -7, vjust = 2) -> Fig4
+plot_grid(p1, plot_soilgroup2, ncol = 1, labels = c("", "d"), hjust = -7, vjust = 2) -> Fig4
 
 Fig4
-# ggsave("outputs/Figure 4.jpg", width = 8, height = 8, dpi = 300, units = "in")
+ggsave("outputs/Figure 4.jpg", width = 8, height = 8, dpi = 300, units = "in")
 ```
 
 ## Plot CEC representation
@@ -201,5 +223,13 @@ axis(side=1,las=1,cex=1,tcl=0.4, at = seq(0,150,30))
 axis(side=2,las=1,cex=1,tcl=0.4, at = seq(0,0.03,0.01))
 
 dev.off()
+```
+
+## Test code
+```{r}
+# plot(density(wrb, na.rm = TRUE))
+# image(wrb)
+# 
+# rasterToPoints(wrb)
 ```
 

@@ -5,8 +5,9 @@
 # get climate information
 get_koeppon <- function (sdata1, sdata2) {
   
-  # sdata1 = SoilHealthCC
+  # sdata1 = SoilHealthDB
   # sdata2 = koeppen
+  # i = 1
   for (i in 1:nrow(sdata1) ) {
     
     # get the lat and lon from sdata1
@@ -19,7 +20,7 @@ get_koeppon <- function (sdata1, sdata2) {
       ilon <- sdata2$Lon[which.min(abs(sdata2$Lon - target_lon))]
       
       # get the koeppen information
-      target_koeppon <- sdata2 %>% filter(Lat == ilat, Lon == ilon) %>% select(Cls)
+      target_koeppon <- sdata2 %>% filter(Lat == ilat, Lon == ilon) %>% dplyr::select(Cls)
       
       sdata1[i, "Koeppen"] <- target_koeppon$Cls
     }
@@ -31,6 +32,8 @@ get_koeppon <- function (sdata1, sdata2) {
   
   return (sdata1)
 }
+
+
 
 # get MAT MAP
 get_Del <- function (sdata1, sdata2) {
@@ -49,7 +52,7 @@ get_Del <- function (sdata1, sdata2) {
       ilon <- sdata2$Longitude[which.min(abs(sdata2$Longitude - target_lon))]
       
       # get the koeppen information
-      target_Del <- sdata2 %>% filter(Latitude == ilat, Longitude == ilon) %>% select(MAT, MAP)
+      target_Del <- sdata2 %>% filter(Latitude == ilat, Longitude == ilon) %>% dplyr::select(MAT, MAP)
       
       if (nrow(target_Del) == 1) {
         sdata1[i, "MAT_del"] <- target_Del$MAT
@@ -80,7 +83,7 @@ get_soil <- function (sdata1, sdata2) {
       ilon <- sdata2$Longitude[which.min(abs(sdata2$Longitude - target_lon))]
       
       # get the koeppen information
-      target_soil <- sdata2 %>% filter(Latitude == ilat, Longitude == ilon) %>% select(RASTERVALU)
+      target_soil <- sdata2 %>% filter(Latitude == ilat, Longitude == ilon) %>% dplyr::select(RASTERVALU)
       
       if (nrow(target_soil) == 1) {
         sdata1[i, "nDSMW"] <- target_soil$RASTERVALU
@@ -121,6 +124,35 @@ get_cec <- function (sdata1) {
 }
 
 
+# get_wrb
+get_wrb <- function (sdata) {
+  for (i in 1:nrow(sdata) ) {
+    # get the lat and lon from sdata
+    # sdata = SoilHealthDB
+    # i = 3300
+    target_lat <- sdata$Latitude[i]
+    target_lon <- sdata$Longitude[i]
+    
+    if (!is.na(target_lat) & !is.na(target_lon)) {
+      # get the closest lat and lon from koeppen
+      
+      ilat <- wrb_point$y[which.min(abs(wrb_point$y - target_lat))]
+      ilon <- wrb_point$x[which.min(abs(wrb_point$x - target_lon))]
+      
+      # get the wrb information
+      target_wrb <- wrb_point %>% filter(y == ilat, x == ilon) 
+      if (nrow(target_wrb) == 0) {
+        sdata[i, "wrb"] <- NA
+      } else {sdata[i, "wrb"] <- target_wrb$wsrc_}
+    }
+    else {next}
+    print(paste0("====================", i))
+  }
+  return (sdata)
+}
+
+
+
 #*****************************************************************************************************************
 # function for sites spatial distribution plot
 plot_site <- function (sdata) {
@@ -131,22 +163,22 @@ plot_site <- function (sdata) {
   sub_CC <- sdata %>% filter(!Conservation_Type %in% c("OF", "OF-CC", "OF-NT", "AF", "CC-NT"))
   
   # aggregate for sub_CC
-  siteInfor_CC <- sub_CC %>% select(Latitude, Longitude) %>% group_by(Latitude, Longitude) %>% tally()
+  siteInfor_CC <- sub_CC %>% dplyr::select(Latitude, Longitude) %>% group_by(Latitude, Longitude) %>% tally()
   siteInfor_CC <- siteInfor_CC %>% filter(!is.na(Latitude)) %>% mutate(N = ifelse(n >= 75, 75, n))
   siteInfor_CC$var_size <- mean(siteInfor_CC$N)*0.15 + (siteInfor_CC$N)*0.05
   
   # aggregate for NT
-  siteInfor_NT <- sub_NT %>% select(Latitude, Longitude) %>% group_by(Latitude, Longitude) %>% tally()
+  siteInfor_NT <- sub_NT %>% dplyr::select(Latitude, Longitude) %>% group_by(Latitude, Longitude) %>% tally()
   siteInfor_NT <- siteInfor_NT %>% filter(!is.na(Latitude)) %>% mutate(N = ifelse(n >= 75, 75, n))
   siteInfor_NT$var_size <- mean(siteInfor_NT$N)*0.15 + (siteInfor_NT$N)*0.05
   
   # aggregate for OGF
-  siteInfor_OGF <- sub_OGF %>% select(Latitude, Longitude) %>% group_by(Latitude, Longitude) %>% tally()
+  siteInfor_OGF <- sub_OGF %>% dplyr::select(Latitude, Longitude) %>% group_by(Latitude, Longitude) %>% tally()
   siteInfor_OGF <- siteInfor_OGF %>% filter(!is.na(Latitude)) %>% mutate(N = ifelse(n >= 75, 75, n))
   siteInfor_OGF$var_size <- mean(siteInfor_OGF$N)*0.15 + (siteInfor_OGF$N)*0.05
   
   # aggregate for AFS
-  siteInfor_AFS <- sub_AFS %>% select(Latitude, Longitude) %>% group_by(Latitude, Longitude) %>% tally()
+  siteInfor_AFS <- sub_AFS %>% dplyr::select(Latitude, Longitude) %>% group_by(Latitude, Longitude) %>% tally()
   siteInfor_AFS <- siteInfor_AFS %>% filter(!is.na(Latitude)) %>% mutate(N = ifelse(n >= 75, 75, n))
   siteInfor_AFS$var_size <- mean(siteInfor_AFS$N)*0.15 + (siteInfor_AFS$N)*0.05
   

@@ -1,8 +1,10 @@
 # file or dir in this file will be ignored
 .Rhistory
+
 data/MU_Global.csv
 data/T_Clay_CEC.csv
 SHDB.html
+data/
 
 # ignore all files in any directory named Manuscript/SHDB_cash*SHDB/files
 Manuscript/
@@ -15,3 +17,4 @@ Old/
 
 # project path
 # /G/My\ Drive/MyResearch/12.SoilHealthDB/SoilHealthDB
+.Rproj.user
