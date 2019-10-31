@@ -1,8 +1,8 @@
 # file or dir in this file will be ignored
 .Rhistory
 
-data/MU_Global.csv
-data/T_Clay_CEC.csv
+data/other_data/MU_Global.csv
+data/other_data/T_Clay_CEC.csv
 SHDB.html
 data/
 
