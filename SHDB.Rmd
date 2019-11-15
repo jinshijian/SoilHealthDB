@@ -80,7 +80,7 @@ wrb_attributes <- read.csv("data/WRB/wrb.csv")
 
 
 ## Prepare data and calculation
-```{r data calculation}
+```{r data calculation, message=TALSE}
 # The following functions takes long time to finish
 SoilHealthDB <- get_koeppon(SoilHealthDB, koeppen)
 SoilHealthDB <- get_Del(SoilHealthDB, ClimateDel)
@@ -128,8 +128,11 @@ SoilHealthDB %>% mutate(KoeppenGroup = case_when(Koeppen %in% c("Af", "Am", "As"
 
 ## Plot samples spatial distribution
 ```{r plot site spatial distribution}
-plot_site(SoilHealthDB)
-# ggsave("outputs/Figure 1.jpg", width = 8, height = 4, dpi = 300, units = "in")
+pdf("outputs/Figure 1.pdf", width = 8, height = 4)
+print(plot_site(SoilHealthDB)) 
+# ggsave("outputs/Figure 1.pdf", width = 8, height = 4, dpi = 300, units = "in")
+dev.off()
+
 ```
 
 ## Plot climate and soil representation
@@ -174,13 +177,16 @@ SoilHealthDB %>% filter(!is.na(DESCRIP)) %>% ggplot(aes(DESCRIP)) + geom_bar() +
 plot_grid(plot_climate, plot_MAT, plot_MAP, nrow = 1, labels = c("a", "b", "c"), hjust = c(-7.5, -7, -8.5), vjust = 2) -> p1
 plot_grid(p1, plot_soilgroup2, ncol = 1, labels = c("", "d"), hjust = -7, vjust = 2) -> Fig4
 
-Fig4
-ggsave("outputs/Figure 4.jpg", width = 8, height = 8, dpi = 300, units = "in")
+pdf("outputs/Figure 4.pdf", width = 8, height = 8)
+print(Fig4)
+# ggsave("outputs/Figure 4.jpg", width = 8, height = 8, dpi = 300, units = "in")
+dev.off()
 ```
 
 ## Plot CEC representation
 ```{r plot CEC repressentation, fig.height=6, fig.width=4}
-tiff("outputs/Figure 5.tiff", width = 6, height = 8, pointsize = 1/300, units = 'in', res = 300)
+# tiff("outputs/Figure 5.tiff", width = 6, height = 8, pointsize = 1/300, units = 'in', res = 300)
+pdf("outputs/Figure 5.pdf", width = 6, height = 8)
 
 par( mar=c(2, 0.2, 0.2, 0.2)
      , mai=c(0.3, 0.6, 0.1, 0.1)  # by inches, inner margin

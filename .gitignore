@@ -4,7 +4,12 @@
 data/other_data/MU_Global.csv
 data/other_data/T_Clay_CEC.csv
 SHDB.html
-data/
+data/other_data/IGBP2010Point.txt
+data/other_data/Koeppen-Geiger-ASCII.txt
+data/other_data/Koeppen-Geiger-ASCII.txt
+data/other_data/ISSOIL.nc4
+data/other_data/T_CEC_CLAY.nc4
+data/other_data/WRB/
 
 # ignore all files in any directory named Manuscript/SHDB_cash*SHDB/files
 Manuscript/
