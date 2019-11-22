@@ -161,26 +161,31 @@ plot_site <- function (sdata) {
   sub_OGF <- sdata %>% filter(Conservation_Type %in% c("OF", "OF-CC", "OF-NT")) 
   sub_NT <- sdata[sdata$Conservation_Type == "CC-NT",]
   sub_CC <- sdata %>% filter(!Conservation_Type %in% c("OF", "OF-CC", "OF-NT", "AF", "CC-NT"))
+   
   
   # aggregate for sub_CC
   siteInfor_CC <- sub_CC %>% dplyr::select(Latitude, Longitude) %>% group_by(Latitude, Longitude) %>% tally()
   siteInfor_CC <- siteInfor_CC %>% filter(!is.na(Latitude)) %>% mutate(N = ifelse(n >= 75, 75, n))
   siteInfor_CC$var_size <- mean(siteInfor_CC$N)*0.15 + (siteInfor_CC$N)*0.05
+  obs_cc <- nrow(siteInfor_CC)
   
   # aggregate for NT
   siteInfor_NT <- sub_NT %>% dplyr::select(Latitude, Longitude) %>% group_by(Latitude, Longitude) %>% tally()
   siteInfor_NT <- siteInfor_NT %>% filter(!is.na(Latitude)) %>% mutate(N = ifelse(n >= 75, 75, n))
   siteInfor_NT$var_size <- mean(siteInfor_NT$N)*0.15 + (siteInfor_NT$N)*0.05
+  obs_nt <- nrow(siteInfor_NT)
   
   # aggregate for OGF
   siteInfor_OGF <- sub_OGF %>% dplyr::select(Latitude, Longitude) %>% group_by(Latitude, Longitude) %>% tally()
   siteInfor_OGF <- siteInfor_OGF %>% filter(!is.na(Latitude)) %>% mutate(N = ifelse(n >= 75, 75, n))
   siteInfor_OGF$var_size <- mean(siteInfor_OGF$N)*0.15 + (siteInfor_OGF$N)*0.05
+  obs_OF <- nrow(siteInfor_OGF)
   
   # aggregate for AFS
   siteInfor_AFS <- sub_AFS %>% dplyr::select(Latitude, Longitude) %>% group_by(Latitude, Longitude) %>% tally()
   siteInfor_AFS <- siteInfor_AFS %>% filter(!is.na(Latitude)) %>% mutate(N = ifelse(n >= 75, 75, n))
   siteInfor_AFS$var_size <- mean(siteInfor_AFS$N)*0.15 + (siteInfor_AFS$N)*0.05
+  obs_AF <- nrow(siteInfor_AFS)
   
   counties <- map_data("world", region = ".", exact = FALSE)
   
@@ -227,10 +232,10 @@ plot_site <- function (sdata) {
     scale_x_continuous(name="Longitude", breaks=seq(-180,180, 30),labels = seq(-180,180, 30))+
     scale_y_continuous(limits = c(-60, 90),name="Latitude", breaks=seq(-60,90,20),labels = seq(-60,90,20))+
     annotate("text", x = -170, y = 10, label = "Legend", size = 4, adj = 0)+
-    annotate("text", x = -150, y = -5, label = "CC (177)", size = 4, adj = 0)+
-    annotate("text", x = -150, y = -20, label = "NT (58)", size = 4, adj = 0)+
-    annotate("text", x = -150, y = -35, label = "OF (87)", size = 4, adj = 0)+
-    annotate("text", x = -150, y = -50, label = "AS (35)", size = 4, adj = 0)+
+    annotate("text", x = -150, y = -5, label = paste0("CC (", obs_cc, ")"), size = 4, adj = 0)+
+    annotate("text", x = -150, y = -20, label = paste0("NT (", obs_nt, ")"), size = 4, adj = 0)+
+    annotate("text", x = -150, y = -35, label = paste0("OF (", obs_OF, ")"), size = 4, adj = 0)+
+    annotate("text", x = -150, y = -50, label = paste0("AF (", obs_AF,")"), size = 4, adj = 0)+
     # Add legend sign
     geom_point( aes(x=-170, y=-5)
                 , shape=1, col="orange", size = 5

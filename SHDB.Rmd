@@ -9,7 +9,10 @@ output: html_document
 ## Load packages
 ```{r load R packages, message=FALSE, echo=FALSE, cache=TRUE}
 # library("gridExtra")
-# install.packages("agricolae")
+# install.packages(c("agricolae","here","multcompView","ncdf4","bootstrap", "metafor",
+#                    "cowplot", "data.table", "ggplot2", "lubridate", "kableExtra",
+#                    "knitr", "ggpubr", "ggmap", "maps", "mapdata", 'dplyr'
+#                    , "tidyr", "stringr"))
 library(here)
 library(agricolae)
 # install.packages('multcompView')
@@ -28,7 +31,7 @@ library(lubridate)
 library(kableExtra)
 library(knitr)
 library("ggpubr")
-library(reshape)
+# library(reshape)
 # install.packages("ggmap")
 library(ggmap)
 # install.packages("maps")
@@ -36,17 +39,19 @@ library(maps)
 # install.packages("mapdata")
 library(mapdata)
 library(tidyr)
-# install.packages('dplyr')
+# install.packages('car')
 library(car)
 library(dplyr)
 library(stringr)
 
-# install.packages("raster")
+# install.packages("tiff")
 library(tiff)
 library(raster)
 
 source('RScripts/functions.R')
 ```
+
+
 
 ## Preliminary setup
 ```{r preliminaries, message=FALSE, include=FALSE, echo=FALSE, cache=FALSE}
@@ -55,6 +60,7 @@ knitr::opts_chunk$set(results = 'hide', message = TRUE, include = TRUE, echo = F
                       fig.height = 4, fig.width = 8)
  
 ```
+
 
 ## Load data
 ```{r load data1}
@@ -78,6 +84,9 @@ SoilHealthDB %>% mutate(Lat_round = round(Latitude*4)/4, Long_round = round(Long
 wrb_attributes <- read.csv("data/WRB/wrb.csv")
 ```
 
+```{r}
+SoilHealthDB %>% dplyr::select(Country) %>% unique() %>% arrange()
+```
 
 ## Prepare data and calculation
 ```{r data calculation, message=TALSE}
