@@ -16,6 +16,7 @@ Manuscript/
 SHDB_cache/
 SHDB_files/
 Old/
+References/
 
 # ignore all .ini
 *.ini
