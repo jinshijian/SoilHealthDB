@@ -1,6 +1,5 @@
 # file or dir in this file will be ignored
 .Rhistory
-SoilHealthDB.zip
 
 data/other_data/MU_Global.csv
 data/other_data/T_Clay_CEC.csv
@@ -11,6 +10,7 @@ data/other_data/Koeppen-Geiger-ASCII.txt
 data/other_data/ISSOIL.nc4
 data/other_data/T_CEC_CLAY.nc4
 data/other_data/WRB/
+data/SoilHealthDB_new_input.gsheet
 
 # ignore all files in any directory named Manuscript/SHDB_cash*SHDB/files
 Manuscript/
@@ -18,7 +18,6 @@ SHDB_cache/
 SHDB_files/
 Old/
 References/
-
 
 # ignore all .ini
 *.ini
