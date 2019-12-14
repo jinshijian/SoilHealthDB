@@ -15,21 +15,21 @@ output: html_document
 #                    , "tidyr", "stringr"))
 library(here)
 library(agricolae)
-# install.packages('multcompView')
+# install.packages('agricolae')
 library(multcompView)
 # install.packages("ncdf4")
 library(ncdf4)
 # install.packages("bootstrap")
-# install.packages("metafor")
+# install.packages("data.table")
 library("metafor")
 library("bootstrap")
 library(cowplot)
-library(data.table)
+# library("knitr")
 library(ggplot2)
 theme_set(theme_bw())
 library(lubridate)
 library(kableExtra)
-library(knitr)
+# library(knitr)
 library("ggpubr")
 # library(reshape)
 # install.packages("ggmap")
@@ -40,13 +40,14 @@ library(maps)
 library(mapdata)
 library(tidyr)
 # install.packages('car')
-library(car)
+# library(car)
 library(dplyr)
 library(stringr)
 
-# install.packages("tiff")
+# install.packages("rgdal")
 library(tiff)
 library(raster)
+library(rgdal)
 
 source('RScripts/functions.R')
 ```
@@ -135,14 +136,17 @@ SoilHealthDB %>% mutate(KoeppenGroup = case_when(Koeppen %in% c("Af", "Am", "As"
 # SoilHealthDB %>% filter(str_detect(FAOSOIL, "WAT")) %>% count() #183
 ```
 
+
 ## Plot samples spatial distribution
 ```{r plot site spatial distribution}
-pdf("outputs/Figure 1.pdf", width = 8, height = 4)
+# pdf("outputs/Figure 1.pdf", width = 8, height = 4)
 print(plot_site(SoilHealthDB)) 
 # ggsave("outputs/Figure 1.pdf", width = 8, height = 4, dpi = 300, units = "in")
-dev.off()
+ggsave("outputs/Figure 1.tiff", width = 8, height = 4, dpi = 300, units = "in")
+# dev.off()
 
 ```
+
 
 ## Plot climate and soil representation
 ```{r climate representation, fig.width=8, fig.height=8}
