@@ -87,6 +87,8 @@ wrb_attributes <- read.csv("data/WRB/wrb.csv")
 
 ```{r}
 SoilHealthDB %>% dplyr::select(Country) %>% unique() %>% arrange()
+SoilHealthDB %>% dplyr::select(Longitude, Latitude) %>% unique()
+SoilHealthDB %>% dplyr::select(ExperimentID) %>% unique()
 ```
 
 ## Prepare data and calculation
