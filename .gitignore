@@ -22,6 +22,9 @@ References/
 
 # ignore all .ini
 *.ini
+*.DS_Store
+*.RData
+*.html
 
 # project path
 # /G/My\ Drive/MyResearch/12.SoilHealthDB/SoilHealthDB
